@@ -21,7 +21,7 @@ fn lexer_errors() {
         let normalized_contents = normalize_line_endings(&contents);
         let res: Result<Vec<_>, _> =
             tokenize(&normalized_contents, Delimiters::default()).collect();
-        assert!(res.is_err());
+        assert!(res.is_err(), "Assertion res.is_err() failed for {path:?}");
         insta::assert_debug_snapshot!(res.unwrap_err());
     });
 }

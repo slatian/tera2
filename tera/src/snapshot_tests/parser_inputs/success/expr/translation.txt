@@ -1,0 +1,11 @@
+---
+source: tera/src/snapshot_tests/parser.rs
+assertion_line: 35
+expression: Expressions(expr_nodes)
+input_file: tera/src/snapshot_tests/parser_inputs/success/expr/translation.txt
+---
+$"message_id"{potential='arg'}
+$"message_id"{no arguments}
+$"message_id"{no arguments}
+$"message \"id\""{no arguments}
+$"message_id"{argument=1}

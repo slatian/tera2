@@ -1,0 +1,13 @@
+---
+source: tera/src/snapshot_tests/rendering.rs
+assertion_line: 156
+expression: "&normalized_out"
+input_file: tera/src/snapshot_tests/rendering_inputs/success/translation.txt
+---
+Hallo Tera2!
+
+Foo
+
+Spaaaace!
+
+SPAAAACE!

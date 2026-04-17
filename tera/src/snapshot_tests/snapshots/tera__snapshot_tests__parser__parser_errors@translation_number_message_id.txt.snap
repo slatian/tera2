@@ -1,0 +1,11 @@
+---
+source: tera/src/snapshot_tests/parser.rs
+assertion_line: 51
+expression: res.unwrap_err()
+input_file: tera/src/snapshot_tests/parser_inputs/errors/translation_number_message_id.txt
+---
+error: Expected identifier or string after `$` to start translation.
+ --> translation_number_message_id.txt:1:4
+  |
+1 | {{ $1 }}
+  |     ^

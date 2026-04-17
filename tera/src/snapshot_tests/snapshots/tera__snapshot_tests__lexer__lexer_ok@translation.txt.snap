@@ -1,0 +1,33 @@
+---
+source: tera/src/snapshot_tests/lexer.rs
+assertion_line: 13
+expression: "&tokens"
+input_file: tera/src/snapshot_tests/lexer_inputs/success/translation.txt
+---
+[
+    VARIABLE_START(false),
+    TRANSLATION,
+    IDENT(message_id),
+    LEFT_PAREN,
+    IDENT(potential),
+    ASSIGN,
+    STRING("arg"),
+    RIGHT_PAREN,
+    VARIABLE_END(false),
+    CONTENT("\n"),
+    VARIABLE_START(false),
+    TRANSLATION,
+    IDENT(message_id),
+    VARIABLE_END(false),
+    CONTENT("\n"),
+    VARIABLE_START(false),
+    TRANSLATION,
+    STRING("message_id"),
+    VARIABLE_END(false),
+    CONTENT("\n"),
+    VARIABLE_START(false),
+    TRANSLATION,
+    STRING("message \"id\""),
+    VARIABLE_END(false),
+    CONTENT("\n"),
+]

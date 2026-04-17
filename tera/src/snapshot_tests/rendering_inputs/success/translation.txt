@@ -1,0 +1,7 @@
+{{ $hello }}
+
+{{ $foo }}
+
+{{ $"with space" }}
+
+{{ $"with space" | upper }}

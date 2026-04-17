@@ -495,7 +495,7 @@ pub struct TranslationCall {
 
 impl fmt::Display for TranslationCall {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "${}", self.name)?;
+        write!(f, "${:?}", self.name)?;
         write!(f, "{{",)?;
 	    if let Some(kwargs) = &self.kwargs {
 	        let mut keys = kwargs.keys().collect::<Vec<_>>();
