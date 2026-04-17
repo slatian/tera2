@@ -497,19 +497,19 @@ impl fmt::Display for TranslationCall {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "${:?}", self.name)?;
         write!(f, "{{",)?;
-	    if let Some(kwargs) = &self.kwargs {
-	        let mut keys = kwargs.keys().collect::<Vec<_>>();
-	        keys.sort();
-	        for (i, k) in keys.iter().enumerate() {
-	            if i == kwargs.len() - 1 {
-	                write!(f, "{}={}", k, kwargs[*k])?
-	            } else {
-	                write!(f, "{}={}, ", k, kwargs[*k])?
-	            }
-	        }
-	    } else {
-		    write!(f, "no arguments")?
-	    }
+        if let Some(kwargs) = &self.kwargs {
+            let mut keys = kwargs.keys().collect::<Vec<_>>();
+            keys.sort();
+            for (i, k) in keys.iter().enumerate() {
+                if i == kwargs.len() - 1 {
+                    write!(f, "{}={}", k, kwargs[*k])?
+                } else {
+                    write!(f, "{}={}, ", k, kwargs[*k])?
+                }
+            }
+        } else {
+            write!(f, "no arguments")?
+        }
         write!(f, "}}",)
     }
 }

@@ -4,7 +4,6 @@ mod context;
 mod delimiters;
 mod errors;
 mod filters;
-mod translations;
 mod functions;
 #[cfg(feature = "glob_fs")]
 mod globbing;
@@ -13,6 +12,7 @@ mod reporting;
 mod template;
 mod tera;
 mod tests;
+mod translations;
 mod utils;
 pub mod value;
 pub(crate) mod vm;

@@ -231,11 +231,10 @@ impl Tera {
         self.translator = Some(StoredTranslator::new(translator));
     }
 
-	/// 
+    ///
     pub fn reset_translator(&mut self) {
-	    self.translator = None;
+        self.translator = None;
     }
-
 
     /// Register a filter with Tera.
     ///

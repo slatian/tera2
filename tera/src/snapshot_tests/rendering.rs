@@ -144,10 +144,13 @@ fn rendering_ok() {
             }
         });
         let translations: HashMap<String, String> = [
-	        ("hello", "Hallo Tera2!"),
-	        ("foo", "Foo"),
-	        ("with space", "Spaaaace!"),
-	    ].iter().map(|(k,v)| (k.to_string(), v.to_string())).collect();
+            ("hello", "Hallo Tera2!"),
+            ("foo", "Foo"),
+            ("with space", "Spaaaace!"),
+        ]
+        .iter()
+        .map(|(k, v)| (k.to_string(), v.to_string()))
+        .collect();
         tera.set_translator(translations);
         tera.add_raw_templates(vec![(&p, normalized_contents)])
             .unwrap();

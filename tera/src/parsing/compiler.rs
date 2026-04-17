@@ -304,14 +304,14 @@ impl Compiler {
                     .entry(trans.name.clone())
                     .or_default()
                     .push(span.clone());
-	            if let Some(kwargs) = trans.kwargs {
-	                self.compile_kwargs(kwargs);
-	                self.chunk
-	                    .add(Instruction::RunTranslationWithArgs(trans.name), Some(span));
-	            } else {
-	                self.chunk
-	                    .add(Instruction::RunTranslation(trans.name), Some(span));
-	            }
+                if let Some(kwargs) = trans.kwargs {
+                    self.compile_kwargs(kwargs);
+                    self.chunk
+                        .add(Instruction::RunTranslationWithArgs(trans.name), Some(span));
+                } else {
+                    self.chunk
+                        .add(Instruction::RunTranslation(trans.name), Some(span));
+                }
             }
             Expression::UnaryOperation(e) => {
                 let (op, span) = e.into_parts();

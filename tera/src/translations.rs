@@ -2,21 +2,19 @@ use std::{collections::HashMap, fmt::Display, sync::Arc};
 
 use crate::{Error, Kwargs, State, TeraResult, Value, value::FunctionResult};
 
-
 /// The translation function type definition
 pub trait Translator<Res>: Sync + Send + 'static {
-
-	/// The translation function call
+    /// The translation function call
     fn call(&self, message: &str, kwargs: Option<Kwargs>, state: &State) -> Res;
 
     /// Whether the current translators's output should be treated as safe, defaults to `false`
     fn is_safe(&self) -> bool {
         false
     }
-
 }
 
-type TranslationFunc = dyn Fn(&str, Option<Kwargs>, &State) -> TeraResult<Value> + Sync + Send + 'static;
+type TranslationFunc =
+    dyn Fn(&str, Option<Kwargs>, &State) -> TeraResult<Value> + Sync + Send + 'static;
 
 #[derive(Clone)]
 pub(crate) struct StoredTranslator {
@@ -58,13 +56,16 @@ impl StoredTranslator {
     }
 }
 
-
 impl<V> Translator<TeraResult<String>> for HashMap<String, V>
-where V: Display + Sync + Send + 'static {
+where
+    V: Display + Sync + Send + 'static,
+{
     fn call(&self, message: &str, _kwargs: Option<Kwargs>, _state: &State) -> TeraResult<String> {
-	    // TODO: Improve error handling
-        self.get(message)
-	        .map(|s| s.to_string())
-	        .ok_or_else(|| Error::message(format!("Translation failed: message id {message:?} not found")))
+        // TODO: Improve error handling
+        self.get(message).map(|s| s.to_string()).ok_or_else(|| {
+            Error::message(format!(
+                "Translation failed: message id {message:?} not found"
+            ))
+        })
     }
 }
