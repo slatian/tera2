@@ -4,6 +4,7 @@ mod context;
 mod delimiters;
 mod errors;
 mod filters;
+mod translations;
 mod functions;
 #[cfg(feature = "glob_fs")]
 mod globbing;
@@ -26,6 +27,7 @@ pub use filters::Filter;
 pub use functions::Function;
 pub use parsing::parser::Parser;
 pub use tests::Test;
+pub use translations::Translator;
 pub use utils::escape_html;
 pub use value::number::Number;
 pub use value::{Map, Value};

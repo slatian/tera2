@@ -10,11 +10,12 @@ use crate::filters::{Filter, StoredFilter};
 use crate::functions::{Function, StoredFunction};
 use crate::template::{Template, find_parents};
 use crate::tests::{StoredTest, Test, TestResult};
+use crate::translations::StoredTranslator;
 use crate::value::FunctionResult;
 use crate::value::Value;
 use crate::vm::interpreter::VirtualMachine;
 use crate::vm::state::State;
-use crate::{ComponentInfo, Context, HashMap, escape_html};
+use crate::{ComponentInfo, Context, HashMap, Translator, escape_html};
 
 use crate::delimiters::Delimiters;
 #[cfg(feature = "glob_fs")]
@@ -43,6 +44,7 @@ pub struct Tera {
     autoescape_suffixes: Vec<&'static str>,
     #[doc(hidden)]
     pub(crate) escape_fn: EscapeFn,
+    pub(crate) translator: Option<StoredTranslator>,
     global_context: Context,
     pub(crate) filters: HashMap<&'static str, StoredFilter>,
     pub(crate) tests: HashMap<&'static str, StoredTest>,
@@ -217,6 +219,23 @@ impl Tera {
     pub fn reset_escape_fn(&mut self) {
         self.escape_fn = escape_html;
     }
+
+    /// Set the translator to use with this Tera instance.
+    ///
+    /// If a translator already exists, it will be overwritten
+    pub fn set_translator<Trans, Res>(&mut self, translator: Trans)
+    where
+        Trans: Translator<Res>,
+        Res: FunctionResult,
+    {
+        self.translator = Some(StoredTranslator::new(translator));
+    }
+
+	/// 
+    pub fn reset_translator(&mut self) {
+	    self.translator = None;
+    }
+
 
     /// Register a filter with Tera.
     ///
@@ -1128,6 +1147,7 @@ impl Default for Tera {
             templates: HashMap::new(),
             autoescape_suffixes: vec![".html", ".htm", ".xml"],
             escape_fn: escape_html,
+            translator: None,
             global_context: Context::new(),
             filters: HashMap::new(),
             tests: HashMap::new(),

@@ -419,6 +419,36 @@ impl<'tera> VirtualMachine<'tera> {
                     let val = if f.is_safe() { val.mark_safe() } else { val };
                     state.stack.push(val, Some(current_ip..=current_ip));
                 }
+                Instruction::RunTranslationWithArgs(message)|Instruction::RunTranslation(message) => {
+	                let translator = if let Some(t) = &self.tera.translator {
+		                t
+	                } else {
+		                rendering_error!(format!("Translation was invoked but no translator is registred!"), Some(current_ip..=current_ip));
+	                };
+	                let res = if matches!(instr, Instruction::RunTranslationWithArgs(_)) {
+	                    let (kwargs, _) = state.stack.pop();
+	                    translator.call(
+		                    message,
+		                    Some(Kwargs::new(Arc::new(kwargs.into_map().unwrap()))),
+		                    state,
+		                )
+	                } else {
+	                    translator.call(
+		                    message,
+		                    None,
+		                    state,
+		                )
+	                };
+	                match res {
+		                Ok(val) => {
+		                    let val = if translator.is_safe() { val.mark_safe() } else { val };
+		                    state.stack.push(val, Some(current_ip..=current_ip));
+		                }
+		                Err(err) => {
+							rendering_error!(format!("{err}"), Some(current_ip..=current_ip))
+		                }
+	                }
+                }
                 Instruction::RunTest(name) => {
                     let f = &self.tera.tests[name.as_str()];
                     let (kwargs, _) = state.stack.pop();

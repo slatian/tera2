@@ -52,6 +52,10 @@ pub(crate) enum Instruction {
     RenderBodyComponent(String),
     /// Apply the given filter
     ApplyFilter(String),
+    /// Run the translation for the given message
+    RunTranslation(String),
+    /// Run the translation for the given message with arguments
+    RunTranslationWithArgs(String),
     /// Run the given test
     RunTest(String),
     /// Render the given block

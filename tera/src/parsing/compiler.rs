@@ -34,6 +34,7 @@ pub(crate) struct Compiler {
     pub(crate) filter_calls: HashMap<String, Vec<Span>>,
     pub(crate) test_calls: HashMap<String, Vec<Span>>,
     pub(crate) function_calls: HashMap<String, Vec<Span>>,
+    pub(crate) translation_calls: HashMap<String, Vec<Span>>,
     pub(crate) include_calls: HashMap<String, Vec<Span>>,
     pub(crate) top_level_variables: HashSet<String>,
     /// Represents variables set by a loop or by set
@@ -50,6 +51,7 @@ impl Compiler {
             filter_calls: HashMap::new(),
             test_calls: HashMap::new(),
             function_calls: HashMap::new(),
+            translation_calls: HashMap::new(),
             include_calls: HashMap::new(),
             blocks: HashMap::new(),
             block_name_spans: HashMap::new(),
@@ -295,6 +297,21 @@ impl Compiler {
                     .push(span.clone());
                 self.chunk
                     .add(Instruction::CallFunction(func.name), Some(span));
+            }
+            Expression::TranslationCall(e) => {
+                let (trans, span) = e.into_parts();
+                self.translation_calls
+                    .entry(trans.name.clone())
+                    .or_default()
+                    .push(span.clone());
+	            if let Some(kwargs) = trans.kwargs {
+	                self.compile_kwargs(kwargs);
+	                self.chunk
+	                    .add(Instruction::RunTranslationWithArgs(trans.name), Some(span));
+	            } else {
+	                self.chunk
+	                    .add(Instruction::RunTranslation(trans.name), Some(span));
+	            }
             }
             Expression::UnaryOperation(e) => {
                 let (op, span) = e.into_parts();

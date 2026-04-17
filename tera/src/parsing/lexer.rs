@@ -105,6 +105,7 @@ pub enum Token<'a> {
     Tilde,
     Pipe,
     Assign,
+    Translation,
 
     // Rest
     Dot,
@@ -156,6 +157,7 @@ impl<'a> fmt::Debug for Token<'a> {
             Token::Tilde => write!(f, "TILDE"),
             Token::Assign => write!(f, "ASSIGN"),
             Token::Pipe => write!(f, "PIPE"),
+            Token::Translation => write!(f, "TRANSLATION"),
             Token::Equal => write!(f, "EQ"),
             Token::NotEqual => write!(f, "NE"),
             Token::GreaterThan => write!(f, "GT"),
@@ -206,6 +208,7 @@ impl<'a> fmt::Display for Token<'a> {
             Token::Tilde => write!(f, "`~`"),
             Token::Assign => write!(f, "`=`"),
             Token::Pipe => write!(f, "`|`"),
+            Token::Translation => write!(f, "`$`"),
             Token::Equal => write!(f, "`==`"),
             Token::NotEqual => write!(f, "`!="),
             Token::GreaterThan => write!(f, "`>`"),
@@ -583,6 +586,7 @@ fn basic_tokenize(
                         Some(b':') => Some(Token::Colon),
                         Some(b'~') => Some(Token::Tilde),
                         Some(b'|') => Some(Token::Pipe),
+                        Some(b'$') => Some(Token::Translation),
                         Some(b'=') => Some(Token::Assign),
                         Some(b'>') => Some(Token::GreaterThan),
                         Some(b'<') => Some(Token::LessThan),

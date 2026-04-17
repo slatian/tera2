@@ -108,6 +108,8 @@ pub enum Expression {
     Test(Spanned<Test>),
     /// 'a' if truthy else 'b'
     Ternary(Spanned<Ternary>),
+    /// $translation_name(potential="argument")
+    TranslationCall(Spanned<TranslationCall>),
     ComponentCall(Spanned<ComponentCall>),
     FunctionCall(Spanned<FunctionCall>),
     UnaryOperation(Spanned<UnaryOperation>),
@@ -142,6 +144,7 @@ impl Expression {
             Expression::Slice(s) => s.span(),
             Expression::Filter(s) => s.span(),
             Expression::Ternary(s) => s.span(),
+            Expression::TranslationCall(s) => s.span(),
         }
     }
 
@@ -161,6 +164,7 @@ impl Expression {
             Expression::Slice(s) => s.span_mut().expand(span),
             Expression::Filter(s) => s.span_mut().expand(span),
             Expression::Ternary(s) => s.span_mut().expand(span),
+            Expression::TranslationCall(s) => s.span_mut().expand(span),
         }
     }
 }
@@ -193,6 +197,7 @@ impl fmt::Debug for Expression {
             GetItem(i) => fmt::Debug::fmt(i, f),
             Slice(i) => fmt::Debug::fmt(i, f),
             Ternary(i) => fmt::Debug::fmt(i, f),
+            TranslationCall(i) => fmt::Debug::fmt(i, f),
         }
     }
 }
@@ -249,6 +254,7 @@ impl fmt::Display for Expression {
             GetItem(i) => write!(f, "{}", **i),
             Slice(i) => write!(f, "{}", **i),
             Ternary(i) => write!(f, "{}", **i),
+            TranslationCall(i) => write!(f, "{}", **i),
         }
     }
 }
@@ -477,6 +483,33 @@ impl fmt::Display for FunctionCall {
                 write!(f, "{}={}, ", k, self.kwargs[*k])?
             }
         }
+        write!(f, "}}",)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct TranslationCall {
+    pub name: String,
+    pub kwargs: Option<HashMap<String, Expression>>,
+}
+
+impl fmt::Display for TranslationCall {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "${}", self.name)?;
+        write!(f, "{{",)?;
+	    if let Some(kwargs) = &self.kwargs {
+	        let mut keys = kwargs.keys().collect::<Vec<_>>();
+	        keys.sort();
+	        for (i, k) in keys.iter().enumerate() {
+	            if i == kwargs.len() - 1 {
+	                write!(f, "{}={}", k, kwargs[*k])?
+	            } else {
+	                write!(f, "{}={}, ", k, kwargs[*k])?
+	            }
+	        }
+	    } else {
+		    write!(f, "no arguments")?
+	    }
         write!(f, "}}",)
     }
 }

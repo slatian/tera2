@@ -6,9 +6,7 @@ use std::sync::Arc;
 use crate::delimiters::Delimiters;
 use crate::errors::{Error, ErrorKind, ReportError, TeraResult};
 use crate::parsing::ast::{
-    Array, ArrayEntry, BinaryOperation, Block, BlockSet, ComponentArgument, ComponentCall,
-    ComponentDefinition, Expression, Filter, FilterSection, ForLoop, FunctionCall, GetAttr,
-    GetItem, If, Include, Map, MapEntry, Set, Slice, Ternary, Test, Type, UnaryOperation, Var,
+    Array, ArrayEntry, BinaryOperation, Block, BlockSet, ComponentArgument, ComponentCall, ComponentDefinition, Expression, Filter, FilterSection, ForLoop, FunctionCall, GetAttr, GetItem, If, Include, Map, MapEntry, Set, Slice, Ternary, Test, TranslationCall, Type, UnaryOperation, Var
 };
 use crate::parsing::ast::{BinaryOperator, Node, UnaryOperator};
 use crate::parsing::lexer::{Token, tokenize};
@@ -690,6 +688,7 @@ impl<'a> Parser<'a> {
                 lhs.expand_span(&self.current_span);
                 lhs
             }
+            Token::Translation => self.parse_translation_call()?,
             _ => {
                 return Err(Error::syntax_error(
                     format!(
@@ -1397,6 +1396,40 @@ impl<'a> Parser<'a> {
                 &self.current_span,
             )),
         }
+    }
+
+    fn parse_translation_call(&mut self) -> TeraResult<Expression> {
+        let mut span = self.current_span.clone();
+        // dollar already taken by expression switch
+        // parse identifier or string
+        let (tag_token, _) = self.next_or_error()?;
+        let name = match tag_token {
+            Token::Ident(name)|Token::Str(name) => {
+				name.to_string()
+            }
+            Token::String(name) => name,
+            _ => {
+                return Err(Error::syntax_error(
+                    "Expected identifier or string after `$` to start translation.".to_string(),
+                    &self.current_span
+                ));
+            },
+        };
+
+		// Parse optional kwargs
+		let kwargs = if matches!(self.next, Some(Ok((Token::LeftParen, _)))) {
+            let kwargs = self.parse_kwargs()?;
+			Some(kwargs)
+		} else {
+			None
+		};
+        span.expand(&self.current_span);
+
+		let translation_call = TranslationCall {
+			name,
+			kwargs
+		};
+        Ok(Expression::TranslationCall(Spanned::new(translation_call, span)))
     }
 
     fn parse_until<F: Fn(&Token) -> bool>(&mut self, end_check_fn: F) -> TeraResult<Vec<Node>> {
