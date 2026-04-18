@@ -22,6 +22,7 @@ pub struct Template {
     pub(crate) filter_calls: HashMap<String, Vec<Span>>,
     pub(crate) test_calls: HashMap<String, Vec<Span>>,
     pub(crate) function_calls: HashMap<String, Vec<Span>>,
+    pub(crate) translation_calls: HashMap<String, Vec<Span>>,
     pub(crate) include_calls: HashMap<String, Vec<Span>>,
     /// The number of bytes of raw content in its parents and itself
     pub(crate) raw_content_num_bytes: usize,
@@ -84,6 +85,7 @@ impl Template {
         let mut filter_calls = body_compiler.filter_calls;
         let mut test_calls = body_compiler.test_calls;
         let mut function_calls = body_compiler.function_calls;
+        let mut translation_calls = body_compiler.translation_calls;
         let mut include_calls = body_compiler.include_calls;
         let top_level_variables = body_compiler.top_level_variables;
 
@@ -103,6 +105,9 @@ impl Template {
                 }
                 for (name, spans) in compiler.function_calls {
                     function_calls.entry(name).or_default().extend(spans);
+                }
+                for (name, spans) in compiler.translation_calls {
+                    translation_calls.entry(name).or_default().extend(spans);
                 }
                 for (name, spans) in compiler.include_calls {
                     include_calls.entry(name).or_default().extend(spans);
@@ -129,6 +134,7 @@ impl Template {
             filter_calls,
             test_calls,
             function_calls,
+            translation_calls,
             include_calls,
             top_level_variables,
             block_lineage: HashMap::new(),

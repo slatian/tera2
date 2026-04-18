@@ -1,5 +1,7 @@
 //! Build errors are errors that Tera catches when loading templates
 //! eg a template inheriting from a template that isn't there
+use std::collections::HashMap;
+
 use crate::tera::Tera;
 
 use crate::snapshot_tests::utils::{normalize_line_endings, split_multi_templates};
@@ -12,6 +14,8 @@ fn build_errors() {
         let normalized_contents = normalize_line_endings(&contents);
         let tpls = split_multi_templates(&normalized_contents);
         let mut tera = Tera::default();
+        // register an empty translator
+        tera.set_translator(HashMap::<String, String>::new());
         let err = tera.add_raw_templates(tpls).unwrap_err();
         insta::assert_snapshot!(&err);
     });

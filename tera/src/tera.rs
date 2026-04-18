@@ -10,7 +10,7 @@ use crate::filters::{Filter, StoredFilter};
 use crate::functions::{Function, StoredFunction};
 use crate::template::{Template, find_parents};
 use crate::tests::{StoredTest, Test, TestResult};
-use crate::translations::StoredTranslator;
+use crate::translations::{StoredTranslator, TranslationMessageAvailability};
 use crate::value::FunctionResult;
 use crate::value::Value;
 use crate::vm::interpreter::VirtualMachine;
@@ -223,15 +223,14 @@ impl Tera {
     /// Set the translator to use with this Tera instance.
     ///
     /// If a translator already exists, it will be overwritten
-    pub fn set_translator<Trans, Res>(&mut self, translator: Trans)
+    pub fn set_translator<Trans>(&mut self, translator: Trans)
     where
-        Trans: Translator<Res>,
-        Res: FunctionResult,
+        Trans: Translator,
     {
         self.translator = Some(StoredTranslator::new(translator));
     }
 
-    ///
+    /// Remove the translator again
     pub fn reset_translator(&mut self) {
         self.translator = None;
     }
@@ -476,6 +475,37 @@ impl Tera {
                 for span in spans {
                     let err = ReportError::new(
                         format!("Unknown function `{func}`"),
+                        &tpl.name,
+                        &tpl.source,
+                        span,
+                    );
+                    errors.push((span.range.start, err.generate_report()));
+                }
+            }
+        }
+
+        if let Some(translator) = &self.translator {
+            for (message, spans) in &tpl.translation_calls {
+                match translator.is_message_available(message) {
+                    TranslationMessageAvailability::NotAvailable => {
+                        for span in spans {
+                            let err = ReportError::new(
+                                format!("Unknown translation message {message:?}"),
+                                &tpl.name,
+                                &tpl.source,
+                                span,
+                            );
+                            errors.push((span.range.start, err.generate_report()));
+                        }
+                    }
+                    _ => { /* Ignore for now */ }
+                }
+            }
+        } else {
+            for spans in tpl.translation_calls.values() {
+                for span in spans {
+                    let err = ReportError::new(
+                        "Translation is not avilable, no translator is set".to_string(),
                         &tpl.name,
                         &tpl.source,
                         span,
