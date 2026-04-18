@@ -1420,7 +1420,12 @@ impl<'a> Parser<'a> {
         // Parse optional kwargs
         let kwargs = if matches!(self.next, Some(Ok((Token::LeftParen, _)))) {
             let kwargs = self.parse_kwargs()?;
-            Some(kwargs)
+            // Treat empty kwargs the same as no args at all
+            if kwargs.is_empty() {
+                None
+            } else {
+                Some(kwargs)
+            }
         } else {
             None
         };
